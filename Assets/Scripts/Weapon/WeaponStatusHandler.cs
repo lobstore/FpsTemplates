@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class WeaponStatusHandler : MonoBehaviour
 {
+    Weapon prevWeapon;
     WeaponController _weaponController;
     [SerializeField] TextMeshProUGUI ammoText;
     // Start is called before the first frame update
@@ -14,24 +15,27 @@ public class WeaponStatusHandler : MonoBehaviour
     }
     private void OnDisable()
     {
-        _weaponController?.OnAmmoChanged.RemoveListener(DrawAmmo);
-        _weaponController?.OnWeaponSwitched.RemoveListener(DrawNextWeaponStatus);
+        _weaponController?.OnWeaponSwitched.RemoveListener(ApplyChangeWeapon);
     }
     private void Initialize()
     {
         _weaponController = GetComponent<WeaponController>();
         if (_weaponController != null)
         {
-            _weaponController.OnWeaponSwitched.AddListener(DrawNextWeaponStatus);
-            _weaponController.OnAmmoChanged.AddListener(DrawAmmo);
-            ammoText.text = _weaponController.activeWeapon.CurrentAmmo.ToString();
+            _weaponController.OnWeaponSwitched.AddListener(ApplyChangeWeapon);
+            prevWeapon = _weaponController.ActiveWeapon;
+            prevWeapon?.OnAmmoChanged.AddListener(DrawAmmo);
+            ammoText.text = prevWeapon?.CurrentAmmo.ToString();
         }
     }
-    private void DrawNextWeaponStatus()
+    private void ApplyChangeWeapon(Weapon nextWeapon)
     {
         if (_weaponController != null)
         {
-            ammoText.text = _weaponController.activeWeapon.CurrentAmmo.ToString();
+            prevWeapon?.OnAmmoChanged.RemoveListener(DrawAmmo);
+            nextWeapon?.OnAmmoChanged.AddListener(DrawAmmo);
+            ammoText.text = nextWeapon?.CurrentAmmo.ToString();
+            prevWeapon = nextWeapon;
         }
     }
     private void DrawAmmo(int ammoAmount)

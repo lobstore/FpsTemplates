@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 1805934821953553457}
   - component: {fileID: 5107783438430759958}
   - component: {fileID: 8926690064379184976}
-  - component: {fileID: 3894544363509203197}
   - component: {fileID: -7773963375342377547}
+  - component: {fileID: 8282046375531805679}
   m_Layer: 0
   m_Name: AWP
   m_TagString: Untagged
@@ -107,20 +107,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3894544363509203197
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1942510410703549421}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ae8d4d752653904dae4229266b9ae19, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <WeaponType>k__BackingField: 1
-  <WeaponRoot>k__BackingField: {fileID: 1942510410703549421}
 --- !u!54 &-7773963375342377547
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -148,3 +134,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &8282046375531805679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942510410703549421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 716a2cbc7b8fb8a4aa4a7706ede3a198, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <WeaponRoot>k__BackingField: {fileID: 1942510410703549421}
+  config: {fileID: 11400000, guid: d2b148ff6faf4f5459a9a2b2307c73d1, type: 2}

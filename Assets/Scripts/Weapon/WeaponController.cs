@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 [System.Serializable]
@@ -18,29 +16,25 @@ public struct CrosshairData
 public class WeaponController : MonoBehaviour
 {
     public Transform _camera;
-    [SerializeField] private List<Weapon> _weapons = new List<Weapon>();
+    [SerializeField] private List<Weapon> _weaponsOnStart = new List<Weapon>();
     Weapon[] m_WeaponSlots = new Weapon[9];
     private int activeWeaponIndex = 0;
-    public Weapon activeWeapon { get; private set; }
+    public Weapon ActiveWeapon { get; private set; }
     [SerializeField] private Transform weaponHolder;
     IWeaponInput _weaponInput;
-    bool IsShooting = false;
-    bool IsOnCooldown = false;
-
-    public UnityEvent<int> OnAmmoChanged { get; } = new();
-    public UnityEvent OnWeaponSwitched {get; } = new();
+    public UnityEvent<Weapon> OnWeaponSwitched { get; } = new();
     public int ActiveWeaponIndex
     {
         get { return activeWeaponIndex; }
         set
         {
-            if (value > _weapons.Count)
+            if (value > m_WeaponSlots.Length - 1)
             {
                 activeWeaponIndex = 0;
             }
             else if (value < 0)
             {
-                activeWeaponIndex = _weapons.Count - 1;
+                activeWeaponIndex = m_WeaponSlots.Length - 1;
             }
             else
             {
@@ -55,97 +49,72 @@ public class WeaponController : MonoBehaviour
         _weaponInput.OnWeaponSwitch.AddListener(ScrollWeapon);
         _weaponInput.IsShooting.AddListener(Shoot);
         _weaponInput.OnAmmoReload.AddListener(Reload);
-        foreach (var weapon in _weapons)
+        if (_weaponsOnStart.Count > 0)
         {
-            AddWeapon(weapon);
+            foreach (var weapon in _weaponsOnStart)
+            {
+                weapon.Owner = GetComponent<Character>();
+                AddWeapon(weapon);
+            }
+            ActiveWeapon = m_WeaponSlots[activeWeaponIndex];
+            ScrollWeapon(0);
         }
-        activeWeapon = m_WeaponSlots[activeWeaponIndex];
-        ScrollWeapon(0);
-    }
-
-
-    // Update is called once per frame
-    void Update()
-    {
 
     }
+
     private void Reload()
     {
-        activeWeapon.Reload();
-        OnAmmoChanged.Invoke(activeWeapon.CurrentAmmo);
+        if (ActiveWeapon != null)
+            ActiveWeapon.Reload();
     }
     private void Shoot(bool buttonPressed)
     {
-        if (buttonPressed && !IsOnCooldown)
+        if (ActiveWeapon != null)
+            ActiveWeapon.Shoot(buttonPressed);
+    }
+
+    private void ScrollWeapon(float direction)
+    {
+        bool InventoryIsNotEmpty = false;
+        for (int i = 0; i < m_WeaponSlots.Length; i++)
         {
-            IsShooting = true;
-            switch (activeWeapon.WeaponType)
+            if (m_WeaponSlots[i] != null)
             {
-                case WeaponType.Auto:
-                    Shooting();
-                    break;
-                case WeaponType.Manual:
-                    activeWeapon.Shoot();
-                    OnAmmoChanged.Invoke(activeWeapon.CurrentAmmo);
-                    _ = SetCooldown();
-                    break;
-                case WeaponType.Semiauto:
-                    break;
-                default:
-                    break;
+                InventoryIsNotEmpty = true;
             }
+        }
+        if (InventoryIsNotEmpty)
+        {
+
+
+            if (direction > 0)
+            {
+                ++ActiveWeaponIndex;
+
+            }
+            else if (direction < 0)
+            {
+                --ActiveWeaponIndex;
+
+            }
+
+            while (m_WeaponSlots[ActiveWeaponIndex] == null) { ActiveWeaponIndex++; }
+            SwitchWeapon(m_WeaponSlots[ActiveWeaponIndex]);
         }
         else
         {
-            IsShooting = false;
+            return;
         }
-    }
-    private async void Shooting()
-    {
-        while (IsShooting)
-        {
-            activeWeapon.Shoot();
-            OnAmmoChanged.Invoke(activeWeapon.CurrentAmmo);
-            await SetCooldown();
-        }
-    }
-    private async Task SetCooldown()
-    {
-        if (IsOnCooldown == false)
-        {
-            IsOnCooldown = true;
-            await Task.Delay(TimeSpan.FromSeconds(activeWeapon.ShotDelay));
-            IsOnCooldown = false;
-        }
-    }
-    private void ScrollWeapon(float direction)
-    {
-        if (direction > 0)
-        {
-            ++ActiveWeaponIndex;
-
-        }
-        else if (direction < 0)
-        {
-            --ActiveWeaponIndex;
-
-        }
-
-        while (m_WeaponSlots[ActiveWeaponIndex] == null) { ActiveWeaponIndex++; }
-        SwitchWeapon(m_WeaponSlots[ActiveWeaponIndex]);
     }
     public void SwitchWeapon(Weapon nextWeapon)
     {
-        activeWeapon.WeaponRoot.SetActive(false);
+        ActiveWeapon.WeaponRoot.SetActive(false);
         nextWeapon.WeaponRoot.SetActive(true);
-        activeWeapon = nextWeapon;
-        OnWeaponSwitched.Invoke();
+        ActiveWeapon = nextWeapon;
+        OnWeaponSwitched.Invoke(ActiveWeapon);
     }
-
     public bool AddWeapon(Weapon weaponPrefab)
     {
-
-
         // search our weapon slots for the first free one, assign the weapon to it, and return true if we found one. Return false otherwise
         for (int i = 0; i < m_WeaponSlots.Length; i++)
         {
