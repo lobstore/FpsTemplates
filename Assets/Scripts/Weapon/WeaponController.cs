@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 [System.Serializable]
@@ -15,6 +17,7 @@ public struct CrosshairData
 }
 public class WeaponController : MonoBehaviour
 {
+    
     public Transform _camera;
     [SerializeField] private List<Weapon> _weaponsOnStart = new List<Weapon>();
     Weapon[] m_WeaponSlots = new Weapon[9];
@@ -45,6 +48,7 @@ public class WeaponController : MonoBehaviour
 
     void Awake()
     {
+        Character Owner = GetComponent<Character>();
         _weaponInput = GetComponent<IWeaponInput>();
         _weaponInput.OnWeaponSwitch.AddListener(ScrollWeapon);
         _weaponInput.IsShooting.AddListener(Shoot);
@@ -53,7 +57,7 @@ public class WeaponController : MonoBehaviour
         {
             foreach (var weapon in _weaponsOnStart)
             {
-                weapon.Owner = GetComponent<Character>();
+                weapon.Owner = Owner;
                 AddWeapon(weapon);
             }
             ActiveWeapon = m_WeaponSlots[activeWeaponIndex];
@@ -90,15 +94,14 @@ public class WeaponController : MonoBehaviour
             if (direction > 0)
             {
                 ++ActiveWeaponIndex;
-
+                while (m_WeaponSlots[ActiveWeaponIndex] == null) { ++ActiveWeaponIndex; }
             }
             else if (direction < 0)
             {
                 --ActiveWeaponIndex;
-
+                while (m_WeaponSlots[ActiveWeaponIndex] == null) { --ActiveWeaponIndex; }
             }
 
-            while (m_WeaponSlots[ActiveWeaponIndex] == null) { ActiveWeaponIndex++; }
             SwitchWeapon(m_WeaponSlots[ActiveWeaponIndex]);
         }
         else
@@ -109,10 +112,17 @@ public class WeaponController : MonoBehaviour
     public void SwitchWeapon(Weapon nextWeapon)
     {
         ActiveWeapon.WeaponRoot.SetActive(false);
+        GettingUpWeapon();
         nextWeapon.WeaponRoot.SetActive(true);
         ActiveWeapon = nextWeapon;
         OnWeaponSwitched.Invoke(ActiveWeapon);
     }
+    private async void GettingUpWeapon()
+    {
+        ActiveWeapon.IsOnCooldown = true;
+        await Task.Delay(TimeSpan.FromSeconds(1f));
+        ActiveWeapon.IsOnCooldown = false;
+    } 
     public bool AddWeapon(Weapon weaponPrefab)
     {
         // search our weapon slots for the first free one, assign the weapon to it, and return true if we found one. Return false otherwise

@@ -12,10 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2e61bb8ef60b8e41ab2b100548fbef8, type: 3}
   m_Name: AK47Config
   m_EditorClassIdentifier: 
-  WeaponName: AK47
-  <ShotDelay>k__BackingField: 0.05
+  <HolePrefab>k__BackingField: {fileID: 7946916433631454296, guid: d1da04c847d87154d93644069624c091,
+    type: 3}
+  <WeaponName>k__BackingField: AK47
+  <ShotDelay>k__BackingField: 0.07
   <MaxRange>k__BackingField: 1000
-  <MinRecoil>k__BackingField: 0.01
-  <MaxRecoil>k__BackingField: 0.5
+  <MinSpread>k__BackingField: 0.01
+  <MaxSpread>k__BackingField: 0.5
   <MaxAmmo>k__BackingField: 30
   <Damage>k__BackingField: 50
+  <ShotClip>k__BackingField: {fileID: 8300000, guid: 2625bb730be0f5e40b32076ca3da36fa,
+    type: 3}
+  <ReloadClip>k__BackingField: {fileID: 8300000, guid: 916bcdeb4ed01af44bbacd604834b146,
+    type: 3}

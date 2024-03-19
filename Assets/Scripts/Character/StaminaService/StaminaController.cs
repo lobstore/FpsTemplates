@@ -1,9 +1,7 @@
-using System;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
-public class StaminaController : MonoBehaviour, IStaminaController ,IDisposable
+public class StaminaController : MonoBehaviour, IStaminaController
 {
     public UnityEvent<float> OnStaminaChanged { get; } = new();
     public UnityEvent<float> OnStaminaDepleted { get; } = new();
@@ -13,9 +11,10 @@ public class StaminaController : MonoBehaviour, IStaminaController ,IDisposable
     {
         get => stamina.CurrentStamina;
     }
+    public float TimeSinceLastConsume { get; private set; }
+
     private float regenStamina;
     private float rechargeCooldown;
-    private bool isRechargeColdown = false;
     private CancellationTokenSource cancellationTokensource = new CancellationTokenSource();
     CancellationToken cancellationToken;
 
@@ -27,46 +26,25 @@ public class StaminaController : MonoBehaviour, IStaminaController ,IDisposable
         regenStamina = playerConfig.StaminaRegen;
         stamina = new Stamina(playerConfig.MaxStamina);
         cancellationToken = cancellationTokensource.Token;
-        InitializeStaminaRecharge();
     }
-    public void InitializeStaminaRecharge()
-    {
-        StaminaReachargeCooldownWaiter();
-    }
-    public void StopStaminaRecharge()
-    {
-        cancellationTokensource.Cancel();
-    }
-    public void Dispose()
-    {
-        if (!cancellationToken.IsCancellationRequested)
-        {
-            StopStaminaRecharge();
 
-        }
-    }
     public void Update()
     {
-        RegenerateStamina();
-    }
-    async void StaminaReachargeCooldownWaiter()
-    {
-        while (!cancellationToken.IsCancellationRequested)
+        if (CurrentStamina < MaxStamina)
         {
-            if (!isRechargeColdown)
+            TimeSinceLastConsume += Time.deltaTime;
+
+            if (TimeSinceLastConsume > rechargeCooldown)
             {
-                await Task.Yield();
-            }
-            else
-            {
-                await Task.Delay(TimeSpan.FromSeconds(rechargeCooldown));
-                isRechargeColdown = false;
+                RegenerateStamina();
+
             }
         }
+
     }
     private void RegenerateStamina()
     {
-        if (stamina.CurrentStamina < stamina.MaxStamina && !isRechargeColdown)
+        if (stamina.CurrentStamina < stamina.MaxStamina)
         {
             stamina.CurrentStamina += regenStamina * Time.deltaTime;
             OnStaminaChanged.Invoke(stamina.CurrentStamina);
@@ -78,9 +56,9 @@ public class StaminaController : MonoBehaviour, IStaminaController ,IDisposable
     }
     public void ReduceStyamina(float requiredStamina)
     {
-        isRechargeColdown = true;
         stamina.CurrentStamina -= requiredStamina;
         OnStaminaChanged.Invoke(stamina.CurrentStamina);
+        TimeSinceLastConsume = 0;
     }
 
 }

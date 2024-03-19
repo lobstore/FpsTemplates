@@ -12,10 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2e61bb8ef60b8e41ab2b100548fbef8, type: 3}
   m_Name: AWPConfig
   m_EditorClassIdentifier: 
-  WeaponName: AWP
+  <HolePrefab>k__BackingField: {fileID: 7946916433631454296, guid: d1da04c847d87154d93644069624c091,
+    type: 3}
+  <WeaponName>k__BackingField: AWP
   <ShotDelay>k__BackingField: 1
   <MaxRange>k__BackingField: 2000
-  <MinRecoil>k__BackingField: 1
-  <MaxRecoil>k__BackingField: 1
+  <MinSpread>k__BackingField: 1
+  <MaxSpread>k__BackingField: 1
   <MaxAmmo>k__BackingField: 5
   <Damage>k__BackingField: 100
+  <ShotClip>k__BackingField: {fileID: 8300000, guid: be522a69bda81ed4daa4ec22c9f6aea1,
+    type: 3}
+  <ReloadClip>k__BackingField: {fileID: 0}

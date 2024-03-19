@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2e61bb8ef60b8e41ab2b100548fbef8, type: 3}
   m_Name: DeserEagleConfig
   m_EditorClassIdentifier: 
-  WeaponName: DeserEagle
+  <HolePrefab>k__BackingField: {fileID: 7946916433631454296, guid: d1da04c847d87154d93644069624c091,
+    type: 3}
+  <WeaponName>k__BackingField: DesertEagle
   <ShotDelay>k__BackingField: 0.5
   <MaxRange>k__BackingField: 1000
-  <MinRecoil>k__BackingField: 0.2
-  <MaxRecoil>k__BackingField: 0.7
+  <MinSpread>k__BackingField: 0.1
+  <MaxSpread>k__BackingField: 0.5
   <MaxAmmo>k__BackingField: 8
   <Damage>k__BackingField: 60

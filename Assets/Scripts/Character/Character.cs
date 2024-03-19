@@ -3,10 +3,13 @@ using UnityEngine.Events;
 
 public class Character : MonoBehaviour, IDamageable
 {
+    public Vector3 Velocity { get => _controller.velocity; }
+    CharacterController _controller;
     public UnityEvent<float> OnTakeDamage { get; set; } = new UnityEvent<float>();
     private void Start ()
     {
-        GetComponent<IHealthController>().OnHealthGone.AddListener(PlayDead);
+        _controller = GetComponent<CharacterController>();
+        GetComponent<IHealthController>()?.OnHealthGone.AddListener(PlayDead);
     }
 
     private void PlayDead()
@@ -16,6 +19,6 @@ public class Character : MonoBehaviour, IDamageable
     public void TakeDamage(float damageTaken)
     {
         Debug.Log("TakenDamage");
-        OnTakeDamage.Invoke(damageTaken);
+        OnTakeDamage?.Invoke(damageTaken);
     }
 }
