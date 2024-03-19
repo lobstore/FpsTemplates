@@ -1,11 +1,13 @@
-using System;
-using System.Threading.Tasks;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+
+using Random = UnityEngine.Random;
 [RequireComponent(typeof(AudioSource))]
+[RequireComponent(typeof(Animator))]
 public abstract class Weapon : MonoBehaviour
 {
-
+    protected Animator _animator;
     protected AudioSource _audioSource;
     protected AudioClip shot_Clip;
     protected AudioClip reload_Clip;
@@ -23,6 +25,7 @@ public abstract class Weapon : MonoBehaviour
     public UnityEvent OnAmmoExpired { get; } = new();
 
     public float ShotDelay { get; protected set; }
+    public float ReloadTime { get; protected set; }
     public float MaxRange { get; protected set; }
     public int MaxAmmo { get => maxAmmo; protected set => maxAmmo = value; }
     public int CurrentAmmo
@@ -80,6 +83,7 @@ public abstract class Weapon : MonoBehaviour
 
     private void Awake()
     {
+
         if (config != null)
         {
             HolePrefab = config.HolePrefab;
@@ -94,47 +98,80 @@ public abstract class Weapon : MonoBehaviour
             CurrentSpread = MinSpread;
             shot_Clip = config.ShotClip;
             reload_Clip = config.ReloadClip;
+            ReloadTime = config.ReloadTime;
         }
+        _animator = GetComponent<Animator>();
         CameraTransform = Camera.main.transform;
         _audioSource = GetComponent<AudioSource>();
     }
-    public virtual async void Reload()
+    private void OnEnable()
+    {
+        _animator.SetBool("Reloading", false);
+    }
+    private void OnDisable()
+    {
+        IsReloading = false;
+        StopAllCoroutines();
+    }
+    public virtual void Reload()
     {
         if (!IsReloading && CurrentAmmo < MaxAmmo)
         {
-            if (reload_Clip != null)
-            {
-                _audioSource.PlayOneShot(reload_Clip);
-                IsReloading = true;
-                await Task.Delay(TimeSpan.FromSeconds(reload_Clip.length));
+            StartCoroutine(Reloading());
+        }
+    }
+    protected virtual IEnumerator Reloading()
+    {
 
-            }
-            CurrentAmmo = MaxAmmo;
-            OnAmmoChanged.Invoke(CurrentAmmo);
-            IsReloading = false;
-        }
+        _audioSource.PlayOneShot(reload_Clip);
+        IsReloading = true;
+        _animator.SetBool("Reloading", true);
+        yield return new WaitForSeconds(reload_Clip.length-0.25f);
+        _animator.SetBool("Reloading", false);
+        yield return new WaitForSeconds(0.25f);
+        IsReloading = false;
+
+        CurrentAmmo = MaxAmmo;
+        OnAmmoChanged.Invoke(CurrentAmmo);
+
+
     }
-    public abstract void Shoot(bool isShooting);
-    public virtual async Task SetShootCooldown()
+    public virtual void Shoot(bool isShooting)
     {
-        if (IsOnCooldown == false)
+
+        if (CurrentAmmo > 0 && TimeSinceLastShot >= ShotDelay && !IsOnCooldown && !IsReloading)
         {
-            IsOnCooldown = true;
-            await Task.Delay(TimeSpan.FromSeconds(ShotDelay));
-            IsOnCooldown = false;
+            Debug.DrawRay(CameraTransform.position + new Vector3(Random.Range(-CurrentSpread, CurrentSpread), Random.Range(-CurrentSpread, CurrentSpread)), CameraTransform.transform.forward * MaxRange, Color.red);
+            RaycastHit hit;
+            Physics.Raycast(CameraTransform.position + new Vector3(Random.Range(-CurrentSpread, CurrentSpread), Random.Range(-CurrentSpread, CurrentSpread)), CameraTransform.transform.forward, out hit, MaxRange);
+            if (hit.collider != null && hit.collider.GetComponent<Character>() != Owner)
+            {
+                CreateBulletHole(hit.point);
+                if (hit.collider.GetComponent<IDamageable>() != null)
+                {
+                    hit.collider.GetComponent<IDamageable>().TakeDamage(Damage);
+                }
+            }
+            CurrentAmmo--;
+            OnAmmoChanged.Invoke(CurrentAmmo);
+            TimeSinceLastShot = 0;
+            CurrentSpread += 0.05f;
+            _audioSource.PlayOneShot(shot_Clip);
+        }
+        else
+        {
+            OnAmmoExpired.Invoke();
         }
     }
-    private void Update()
+    virtual protected void Update()
     {
-        if (Owner.Velocity.magnitude>0) {
-            CurrentSpread += (1f+Owner.Velocity.magnitude) * Time.deltaTime;
-            Debug.Log(CurrentSpread);
+        TimeSinceLastShot += Time.deltaTime;
+        if (Owner.Velocity.magnitude > 0)
+        {
+            CurrentSpread += (1f + Owner.Velocity.magnitude) * Time.deltaTime;
         }
         if (CurrentSpread > MinSpread)
         {
-
-            TimeSinceLastShot += Time.deltaTime;
-
             if (TimeSinceLastShot > DelayBeforDecreaseSpread)
             {
                 float reductionAmount = SpreadEasing * Time.deltaTime;

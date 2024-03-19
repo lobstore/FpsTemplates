@@ -21,6 +21,6 @@ MonoBehaviour:
   <MaxSpread>k__BackingField: 1
   <MaxAmmo>k__BackingField: 5
   <Damage>k__BackingField: 100
-  <ShotClip>k__BackingField: {fileID: 8300000, guid: be522a69bda81ed4daa4ec22c9f6aea1,
+  <ShotClip>k__BackingField: {fileID: 8300000, guid: 2cc67d250ab55484285dffd9c16f9a14,
     type: 3}
   <ReloadClip>k__BackingField: {fileID: 0}

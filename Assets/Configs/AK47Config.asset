@@ -15,7 +15,7 @@ MonoBehaviour:
   <HolePrefab>k__BackingField: {fileID: 7946916433631454296, guid: d1da04c847d87154d93644069624c091,
     type: 3}
   <WeaponName>k__BackingField: AK47
-  <ShotDelay>k__BackingField: 0.07
+  <ShotDelay>k__BackingField: 0.13
   <MaxRange>k__BackingField: 1000
   <MinSpread>k__BackingField: 0.01
   <MaxSpread>k__BackingField: 0.5

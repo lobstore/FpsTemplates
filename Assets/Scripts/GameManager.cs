@@ -13,18 +13,5 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            if (store.activeInHierarchy)
-            {
-                store.SetActive(false);
-                Cursor.lockState = CursorLockMode.Locked;
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.None;
-                store.SetActive(true);
-            }
-        }
     }
 }
