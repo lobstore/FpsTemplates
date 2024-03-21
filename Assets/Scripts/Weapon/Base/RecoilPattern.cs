@@ -58,7 +58,10 @@ public class RecoilPattern
         CurrentSpread = MinSpread;
 
     }
-    public void Reset()
+    public void ResetSpread() {
+        CurrentSpread = MinSpread;
+    }
+    public void ResetRecoil()
     {
         nextShotPosition = Vector3.zero;
         Index = 0;

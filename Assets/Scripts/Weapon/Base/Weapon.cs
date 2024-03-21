@@ -1,8 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
-
-using Random = UnityEngine.Random;
 [RequireComponent(typeof(AudioSource))]
 [RequireComponent(typeof(Animator))]
 public abstract class Weapon : MonoBehaviour
@@ -42,7 +40,7 @@ public abstract class Weapon : MonoBehaviour
     public bool IsOnCooldown { get; set; } = true;
     protected bool IsReloading { get; set; } = false;
 
-    
+
 
     [SerializeField]
     WeaponConfig config;
@@ -84,8 +82,8 @@ public abstract class Weapon : MonoBehaviour
     {
         if (!IsReloading && _magazine.CurrentAmmo < _magazine.MaxAmmoInMagazine)
         {
-            _recoilPattern.Reset();
-            _recoilPattern.CurrentSpread = _recoilPattern.MinSpread;
+            _recoilPattern.ResetRecoil();
+            _recoilPattern.ResetSpread();
             StartCoroutine(Reloading());
         }
     }
@@ -140,12 +138,13 @@ public abstract class Weapon : MonoBehaviour
         TimeSinceLastShot += Time.deltaTime;
         if (Owner.Velocity.magnitude > 0)
         {
-          _recoilPattern.CurrentSpread += (_recoilPattern.SpreadEasing + Owner.Velocity.magnitude) * Time.deltaTime;
+            _recoilPattern.CurrentSpread += (_recoilPattern.SpreadEasing + Owner.Velocity.magnitude) * Time.deltaTime;
         }
         if (_recoilPattern.CurrentSpread > _recoilPattern.MinSpread)
         {
             if (TimeSinceLastShot > DelayBeforDecreaseSpread)
             {
+                _recoilPattern.ResetRecoil();
                 float reductionAmount = _recoilPattern.SpreadEasing * Time.deltaTime;
                 _recoilPattern.CurrentSpread = Mathf.Max(_recoilPattern.CurrentSpread - reductionAmount, _recoilPattern.MinSpread);
 

@@ -5,7 +5,6 @@ public class AutomaticWeapon : Weapon
     public override void Shoot(bool isShooting)
     {
 
-        _recoilPattern.Reset();
         if (isShooting)
         {
             IsShooting = true;
