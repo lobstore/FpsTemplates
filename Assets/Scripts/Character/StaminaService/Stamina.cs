@@ -7,9 +7,9 @@ public class Stamina
     #region Stamina Settings
     private float maxStamina;
     private float currentStamina;
-    public Stamina(float maxStamina)
+    public Stamina(PlayerConfig config)
     {
-        MaxStamina = maxStamina;
+        MaxStamina = config.MaxStamina;
         CurrentStamina = maxStamina;
     }
     public float CurrentStamina

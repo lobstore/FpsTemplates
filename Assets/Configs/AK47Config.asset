@@ -15,13 +15,46 @@ MonoBehaviour:
   <HolePrefab>k__BackingField: {fileID: 7946916433631454296, guid: d1da04c847d87154d93644069624c091,
     type: 3}
   <WeaponName>k__BackingField: AK47
-  <ShotDelay>k__BackingField: 0.13
+  <ShotDelay>k__BackingField: 0.06
+  <ReloadTime>k__BackingField: 0
   <MaxRange>k__BackingField: 1000
   <MinSpread>k__BackingField: 0.01
   <MaxSpread>k__BackingField: 0.5
-  <MaxAmmo>k__BackingField: 30
-  <Damage>k__BackingField: 50
+  <MaxAmmoInMagazine>k__BackingField: 30
+  <AmmoAmount>k__BackingField: 2147483647
+  <Damage>k__BackingField: 180
   <ShotClip>k__BackingField: {fileID: 8300000, guid: 2625bb730be0f5e40b32076ca3da36fa,
     type: 3}
   <ReloadClip>k__BackingField: {fileID: 8300000, guid: 916bcdeb4ed01af44bbacd604834b146,
     type: 3}
+  <RecoilTrace>k__BackingField:
+  - {x: 0, y: 0}
+  - {x: 0.06, y: 0}
+  - {x: 0, y: 0.21}
+  - {x: -0.12, y: 0}
+  - {x: -0.12, y: 0.22}
+  - {x: 0.21, y: -0.13}
+  - {x: 0, y: 0.29}
+  - {x: 0, y: -0.39}
+  - {x: 0.34, y: 0.03}
+  - {x: -0.12, y: 0}
+  - {x: 0, y: -0.36}
+  - {x: 0.21, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0.39}
+  - {x: 0, y: -0.25}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0.36}
+  - {x: 0, y: -0.28}
+  - {x: 0.55, y: 0}
+  - {x: 0, y: -0.19}
+  - {x: 0, y: 0}
+  - {x: 0, y: -0.25}
+  - {x: 0.48, y: 0}
+  - {x: 0, y: -0.12}
+  - {x: 0, y: 0}
+  - {x: 0, y: -0.18}
+  - {x: -0.06, y: 0}
+  - {x: 0, y: 0.24}
+  - {x: 0, y: -0.27}

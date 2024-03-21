@@ -5,18 +5,16 @@ public class StaminaController : MonoBehaviour, IStaminaController
 {
     public UnityEvent<float> OnStaminaChanged { get; } = new();
     public UnityEvent<float> OnStaminaDepleted { get; } = new();
-    private Stamina stamina;
-    public float MaxStamina { get => stamina.MaxStamina; }
+    private Stamina _stamina;
+    public float MaxStamina { get => _stamina.MaxStamina; }
     public float CurrentStamina
     {
-        get => stamina.CurrentStamina;
+        get => _stamina.CurrentStamina;
     }
     public float TimeSinceLastConsume { get; private set; }
 
     private float regenStamina;
     private float rechargeCooldown;
-    private CancellationTokenSource cancellationTokensource = new CancellationTokenSource();
-    CancellationToken cancellationToken;
 
     [SerializeField]
     PlayerConfig playerConfig;
@@ -24,13 +22,13 @@ public class StaminaController : MonoBehaviour, IStaminaController
     {
         rechargeCooldown = playerConfig.RechargeCooldown;
         regenStamina = playerConfig.StaminaRegen;
-        stamina = new Stamina(playerConfig.MaxStamina);
-        cancellationToken = cancellationTokensource.Token;
+        _stamina = new Stamina(playerConfig);
+
     }
 
     public void Update()
     {
-        if (CurrentStamina < MaxStamina)
+        if (_stamina.CurrentStamina < _stamina.MaxStamina)
         {
             TimeSinceLastConsume += Time.deltaTime;
 
@@ -44,20 +42,20 @@ public class StaminaController : MonoBehaviour, IStaminaController
     }
     private void RegenerateStamina()
     {
-        if (stamina.CurrentStamina < stamina.MaxStamina)
+        if (_stamina.CurrentStamina < _stamina.MaxStamina)
         {
-            stamina.CurrentStamina += regenStamina * Time.deltaTime;
-            OnStaminaChanged.Invoke(stamina.CurrentStamina);
+            _stamina.CurrentStamina += regenStamina * Time.deltaTime;
+            OnStaminaChanged.Invoke(_stamina.CurrentStamina);
         }
     }
     public bool HasEnoughStamina(float requiredStamina)
     {
-        return CurrentStamina > requiredStamina;
+        return _stamina.CurrentStamina > requiredStamina;
     }
     public void ReduceStyamina(float requiredStamina)
     {
-        stamina.CurrentStamina -= requiredStamina;
-        OnStaminaChanged.Invoke(stamina.CurrentStamina);
+        _stamina.CurrentStamina -= requiredStamina;
+        OnStaminaChanged.Invoke(_stamina.CurrentStamina);
         TimeSinceLastConsume = 0;
     }
 

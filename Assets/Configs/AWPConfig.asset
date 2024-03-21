@@ -16,11 +16,20 @@ MonoBehaviour:
     type: 3}
   <WeaponName>k__BackingField: AWP
   <ShotDelay>k__BackingField: 1
+  <ReloadTime>k__BackingField: 0
   <MaxRange>k__BackingField: 2000
   <MinSpread>k__BackingField: 1
   <MaxSpread>k__BackingField: 1
-  <MaxAmmo>k__BackingField: 5
+  <MaxAmmoInMagazine>k__BackingField: 5
+  <AmmoAmount>k__BackingField: 15
   <Damage>k__BackingField: 100
   <ShotClip>k__BackingField: {fileID: 8300000, guid: 2cc67d250ab55484285dffd9c16f9a14,
     type: 3}
-  <ReloadClip>k__BackingField: {fileID: 0}
+  <ReloadClip>k__BackingField: {fileID: 8300000, guid: 916bcdeb4ed01af44bbacd604834b146,
+    type: 3}
+  <RecoilTrace>k__BackingField:
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}

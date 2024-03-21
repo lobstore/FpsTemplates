@@ -16,8 +16,22 @@ MonoBehaviour:
     type: 3}
   <WeaponName>k__BackingField: DesertEagle
   <ShotDelay>k__BackingField: 0.5
+  <ReloadTime>k__BackingField: 0
   <MaxRange>k__BackingField: 1000
   <MinSpread>k__BackingField: 0.1
   <MaxSpread>k__BackingField: 0.5
-  <MaxAmmo>k__BackingField: 8
+  <MaxAmmoInMagazine>k__BackingField: 7
+  <AmmoAmount>k__BackingField: 21
   <Damage>k__BackingField: 60
+  <ShotClip>k__BackingField: {fileID: 8300000, guid: 2625bb730be0f5e40b32076ca3da36fa,
+    type: 3}
+  <ReloadClip>k__BackingField: {fileID: 8300000, guid: 916bcdeb4ed01af44bbacd604834b146,
+    type: 3}
+  <RecoilTrace>k__BackingField:
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}

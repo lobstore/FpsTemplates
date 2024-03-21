@@ -7,7 +7,8 @@ public class WeaponStatusHandler : MonoBehaviour
 {
     Weapon prevWeapon;
     WeaponController _weaponController;
-    [SerializeField] TextMeshProUGUI ammoText;
+    [SerializeField] TextMeshProUGUI currentAmmoText;
+    [SerializeField] TextMeshProUGUI amountAmmoText;
     // Start is called before the first frame update
     private void OnEnable()
     {
@@ -24,25 +25,37 @@ public class WeaponStatusHandler : MonoBehaviour
         {
             _weaponController.OnWeaponSwitched.AddListener(ApplyChangeWeapon);
             prevWeapon = _weaponController.ActiveWeapon;
-            prevWeapon?.OnAmmoChanged.AddListener(DrawAmmo);
-            ammoText.text = prevWeapon?.CurrentAmmo.ToString();
+            prevWeapon?.OnCurrentAmmoChanged.AddListener(DrawCurrentAmmo);
+            prevWeapon?.OnAmountAmmoChanged.AddListener(DrawAmountAmmo);
+            currentAmmoText.text = prevWeapon?.CurrentAmmo.ToString();
+            amountAmmoText.text = prevWeapon?.AmmoAmount.ToString();
         }
     }
     private void ApplyChangeWeapon(Weapon nextWeapon)
     {
         if (_weaponController != null)
         {
-            prevWeapon?.OnAmmoChanged.RemoveListener(DrawAmmo);
-            nextWeapon?.OnAmmoChanged.AddListener(DrawAmmo);
-            ammoText.text = nextWeapon?.CurrentAmmo.ToString();
+            prevWeapon?.OnCurrentAmmoChanged.RemoveListener(DrawCurrentAmmo);
+            prevWeapon?.OnAmountAmmoChanged.RemoveListener(DrawAmountAmmo);
+            nextWeapon?.OnCurrentAmmoChanged.AddListener(DrawCurrentAmmo);
+            nextWeapon?.OnAmountAmmoChanged.AddListener(DrawAmountAmmo);
+            currentAmmoText.text = nextWeapon?.CurrentAmmo.ToString();
+            amountAmmoText.text = nextWeapon?.AmmoAmount.ToString();
             prevWeapon = nextWeapon;
         }
     }
-    private void DrawAmmo(int ammoAmount)
+    private void DrawCurrentAmmo(int ammoAmount)
     {
         if (_weaponController != null)
         {
-            ammoText.text = ammoAmount.ToString();
+            currentAmmoText.text = ammoAmount.ToString();
+        }
+    }
+    private void DrawAmountAmmo(int ammoAmount)
+    {
+        if (_weaponController != null)
+        {
+            amountAmmoText.text = ammoAmount.ToString();
         }
     }
 }
