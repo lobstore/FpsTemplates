@@ -19,7 +19,7 @@ MonoBehaviour:
   <ReloadTime>k__BackingField: 0
   <MaxRange>k__BackingField: 1000
   <MinSpread>k__BackingField: 0.01
-  <MaxSpread>k__BackingField: 0.5
+  <MaxSpread>k__BackingField: 0.02
   <MaxAmmoInMagazine>k__BackingField: 30
   <AmmoAmount>k__BackingField: 2147483647
   <Damage>k__BackingField: 180

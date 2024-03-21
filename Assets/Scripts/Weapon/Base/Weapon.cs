@@ -36,34 +36,13 @@ public abstract class Weapon : MonoBehaviour
     {
         get { return _magazine.CurrentAmmo; }
     }
-    public float MinSpread { get; protected set; }
-    public float MaxSpread { get; protected set; }
-    private float currentSpread;
-    public float CurrentSpread
-    {
-        get { return currentSpread; }
-        protected set
-        {
-            if (value > MaxSpread)
-            {
-                currentSpread = MaxSpread;
-            }
-            else if (value <= MinSpread)
-            {
-                currentSpread = MinSpread;
-            }
-            else
-            {
-                currentSpread = value;
-            }
-        }
-    }
+
     protected int Damage { get; set; }
     public bool IsShooting { get; set; } = false;
     public bool IsOnCooldown { get; set; } = true;
     protected bool IsReloading { get; set; } = false;
 
-    public float SpreadEasing { get; protected set; } = 1f;
+    
 
     [SerializeField]
     WeaponConfig config;
@@ -78,13 +57,12 @@ public abstract class Weapon : MonoBehaviour
             _audioSource = GetComponent<AudioSource>();
             _magazine = new WeaponMagazine(config);
             HolePrefab = config.HolePrefab;
-            MinSpread = config.MinSpread;
-            MaxSpread = config.MaxSpread;
+
             MaxRange = config.MaxRange;
             Damage = config.Damage;
             WeaponName = config.WeaponName;
             ShotDelay = config.ShotDelay;
-            CurrentSpread = MinSpread;
+
             shot_Clip = config.ShotClip;
             reload_Clip = config.ReloadClip;
             ReloadTime = config.ReloadTime;
@@ -107,7 +85,7 @@ public abstract class Weapon : MonoBehaviour
         if (!IsReloading && _magazine.CurrentAmmo < _magazine.MaxAmmoInMagazine)
         {
             _recoilPattern.Reset();
-            CurrentSpread = MinSpread;
+            _recoilPattern.CurrentSpread = _recoilPattern.MinSpread;
             StartCoroutine(Reloading());
         }
     }
@@ -132,8 +110,9 @@ public abstract class Weapon : MonoBehaviour
         if (_magazine.CurrentAmmo > 0 && TimeSinceLastShot >= ShotDelay && !IsOnCooldown && !IsReloading)
         {
             RaycastHit hit;
-            Vector3 horizontalDir = _recoilPattern.NextPositionX() * FpsCamera.transform.right;
-            Vector3 verticalDir = _recoilPattern.NextPositionY() * FpsCamera.transform.up;
+            Vector3 nextPosition = _recoilPattern.NextPosition();
+            Vector3 horizontalDir = nextPosition.x * FpsCamera.transform.right;
+            Vector3 verticalDir = nextPosition.y * FpsCamera.transform.up;
             Vector3 shootDir = horizontalDir + verticalDir;
             Physics.Raycast(FpsCamera.transform.position, FpsCamera.transform.forward + shootDir, out hit, MaxRange);
             if (hit.collider != null && hit.collider.GetComponent<Character>() != Owner)
@@ -147,9 +126,8 @@ public abstract class Weapon : MonoBehaviour
             _magazine.CurrentAmmo--;
             OnCurrentAmmoChanged.Invoke(_magazine.CurrentAmmo);
             TimeSinceLastShot = 0;
-            CurrentSpread += 0.05f;
             _audioSource.PlayOneShot(shot_Clip);
-            _recoilPattern.NextIndex();
+            _recoilPattern.CurrentSpread += 0.05f;
         }
         else if (_magazine.CurrentAmmo <= 0 && !IsReloading)
         {
@@ -162,14 +140,14 @@ public abstract class Weapon : MonoBehaviour
         TimeSinceLastShot += Time.deltaTime;
         if (Owner.Velocity.magnitude > 0)
         {
-            CurrentSpread += (1f + Owner.Velocity.magnitude) * Time.deltaTime;
+          _recoilPattern.CurrentSpread += (_recoilPattern.SpreadEasing + Owner.Velocity.magnitude) * Time.deltaTime;
         }
-        if (CurrentSpread > MinSpread)
+        if (_recoilPattern.CurrentSpread > _recoilPattern.MinSpread)
         {
             if (TimeSinceLastShot > DelayBeforDecreaseSpread)
             {
-                float reductionAmount = SpreadEasing * Time.deltaTime;
-                CurrentSpread = Mathf.Max(CurrentSpread - reductionAmount, MinSpread);
+                float reductionAmount = _recoilPattern.SpreadEasing * Time.deltaTime;
+                _recoilPattern.CurrentSpread = Mathf.Max(_recoilPattern.CurrentSpread - reductionAmount, _recoilPattern.MinSpread);
 
             }
         }
