@@ -35,14 +35,20 @@ public class RecoilPattern
         nextShotPosition = Vector3.zero;
         index = 0;
     }
-    public Vector3 NextPosition()
+    public void NextIndex()
     {
-        horizontalRecoil = recoilTrace[Index].x;
-        verticalRecoil = recoilTrace[Index].y;
-        nextShotPosition.y += verticalRecoil;
-        nextShotPosition.x += horizontalRecoil;
         Index++;
-        return nextShotPosition;
     }
-
+    public float NextPositionX()
+    {
+        horizontalRecoil = recoilTrace[Index].x/10;
+        nextShotPosition.x = horizontalRecoil;
+        return nextShotPosition.x;
+    }
+    public float NextPositionY()
+    {
+        verticalRecoil = recoilTrace[Index].y / 10;
+        nextShotPosition.y = verticalRecoil;
+        return nextShotPosition.y;
+    }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -20,8 +19,8 @@ public abstract class Weapon : MonoBehaviour
     public UnityEvent<int> OnCurrentAmmoChanged { get; } = new();
     public UnityEvent<int> OnAmountAmmoChanged { get; } = new();
     public string WeaponName { get; protected set; }
-    [field: SerializeField] 
-    protected Transform CameraTransform { get; set; }
+    [field: SerializeField]
+    protected Camera FpsCamera { get; set; }
 
     [field: SerializeField]
     public GameObject WeaponRoot { get; protected set; }
@@ -89,7 +88,7 @@ public abstract class Weapon : MonoBehaviour
             shot_Clip = config.ShotClip;
             reload_Clip = config.ReloadClip;
             ReloadTime = config.ReloadTime;
-            CameraTransform = Camera.main.transform;
+            FpsCamera = Camera.main;
             _recoilPattern = new RecoilPattern(config);
         }
 
@@ -107,6 +106,8 @@ public abstract class Weapon : MonoBehaviour
     {
         if (!IsReloading && _magazine.CurrentAmmo < _magazine.MaxAmmoInMagazine)
         {
+            _recoilPattern.Reset();
+            CurrentSpread = MinSpread;
             StartCoroutine(Reloading());
         }
     }
@@ -130,9 +131,11 @@ public abstract class Weapon : MonoBehaviour
     {
         if (_magazine.CurrentAmmo > 0 && TimeSinceLastShot >= ShotDelay && !IsOnCooldown && !IsReloading)
         {
-            Debug.DrawRay(CameraTransform.position + _recoilPattern.NextPosition(), CameraTransform.transform.forward * MaxRange, Color.red);
             RaycastHit hit;
-            Physics.Raycast(CameraTransform.position + _recoilPattern.NextPosition(), CameraTransform.transform.forward, out hit, MaxRange);
+            Vector3 horizontalDir = _recoilPattern.NextPositionX() * FpsCamera.transform.right;
+            Vector3 verticalDir = _recoilPattern.NextPositionY() * FpsCamera.transform.up;
+            Vector3 shootDir = horizontalDir + verticalDir;
+            Physics.Raycast(FpsCamera.transform.position, FpsCamera.transform.forward + shootDir, out hit, MaxRange);
             if (hit.collider != null && hit.collider.GetComponent<Character>() != Owner)
             {
                 CreateBulletHole(hit.point);
@@ -146,10 +149,11 @@ public abstract class Weapon : MonoBehaviour
             TimeSinceLastShot = 0;
             CurrentSpread += 0.05f;
             _audioSource.PlayOneShot(shot_Clip);
+            _recoilPattern.NextIndex();
         }
         else if (_magazine.CurrentAmmo <= 0 && !IsReloading)
         {
-            StartCoroutine(Reloading());
+            Reload();
             OnAmmoExpired.Invoke();
         }
     }
@@ -166,7 +170,7 @@ public abstract class Weapon : MonoBehaviour
             {
                 float reductionAmount = SpreadEasing * Time.deltaTime;
                 CurrentSpread = Mathf.Max(CurrentSpread - reductionAmount, MinSpread);
-                
+
             }
         }
     }
