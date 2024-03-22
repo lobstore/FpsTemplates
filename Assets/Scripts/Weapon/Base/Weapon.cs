@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -5,24 +6,24 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Animator))]
 public abstract class Weapon : MonoBehaviour
 {
-    protected RecoilPattern _recoilPattern;
+    protected WeaponRecoil _recoilPattern;
     protected WeaponMagazine _magazine;
     protected Animator _animator;
     protected AudioSource _audioSource;
     protected AudioClip shot_Clip;
     protected AudioClip reload_Clip;
-    private float DelayBeforDecreaseSpread { get; set; } = 0.2f;
+    protected CinemachineImpulseSource _cameraShake;
     protected GameObject HolePrefab { get; set; }
     public Character Owner;
     public UnityEvent<int> OnCurrentAmmoChanged { get; } = new();
     public UnityEvent<int> OnAmountAmmoChanged { get; } = new();
     public string WeaponName { get; protected set; }
     [field: SerializeField]
-    protected Camera FpsCamera { get; set; }
+    protected Transform FpsCamera { get; set; }
 
     [field: SerializeField]
     public GameObject WeaponRoot { get; protected set; }
-    public UnityEvent<float> OnShot { get; } = new();
+    public UnityEvent<Transform> OnShot { get; } = new();
     public UnityEvent OnAmmoExpired { get; } = new();
 
     public float ShotDelay { get; protected set; }
@@ -64,8 +65,9 @@ public abstract class Weapon : MonoBehaviour
             shot_Clip = config.ShotClip;
             reload_Clip = config.ReloadClip;
             ReloadTime = config.ReloadTime;
-            FpsCamera = Camera.main;
-            _recoilPattern = new RecoilPattern(config);
+            FpsCamera = Camera.main.transform;
+            _recoilPattern = new WeaponRecoil(config);
+            _cameraShake = GetComponent<CinemachineImpulseSource>();
         }
 
     }
@@ -112,10 +114,10 @@ public abstract class Weapon : MonoBehaviour
             Vector3 horizontalDir = nextPosition.x * FpsCamera.transform.right;
             Vector3 verticalDir = nextPosition.y * FpsCamera.transform.up;
             Vector3 shootDir = horizontalDir + verticalDir;
-            Physics.Raycast(FpsCamera.transform.position, FpsCamera.transform.forward + shootDir, out hit, MaxRange);
+            Physics.Raycast(FpsCamera.position, FpsCamera.forward + shootDir, out hit, MaxRange);
             if (hit.collider != null && hit.collider.GetComponent<Character>() != Owner)
             {
-                CreateBulletHole(hit.point);
+                CreateBulletHole(hit);
                 if (hit.collider.GetComponent<IDamageable>() != null)
                 {
                     hit.collider.GetComponent<IDamageable>().TakeDamage(Damage);
@@ -125,7 +127,8 @@ public abstract class Weapon : MonoBehaviour
             OnCurrentAmmoChanged.Invoke(_magazine.CurrentAmmo);
             TimeSinceLastShot = 0;
             _audioSource.PlayOneShot(shot_Clip);
-            _recoilPattern.CurrentSpread += 0.05f;
+            _recoilPattern.CurrentSpread += _recoilPattern.RecoilForce;
+            _cameraShake.GenerateImpulse(FpsCamera.up);
         }
         else if (_magazine.CurrentAmmo <= 0 && !IsReloading)
         {
@@ -135,14 +138,14 @@ public abstract class Weapon : MonoBehaviour
     }
     virtual protected void Update()
     {
+        Debug.Log(_recoilPattern.CurrentSpread);
         TimeSinceLastShot += Time.deltaTime;
         if (Owner.Velocity.magnitude > 0)
         {
             _recoilPattern.CurrentSpread += (_recoilPattern.SpreadEasing + Owner.Velocity.magnitude) * Time.deltaTime;
-        }
-        if (_recoilPattern.CurrentSpread > _recoilPattern.MinSpread)
+        }else if (_recoilPattern.CurrentSpread > _recoilPattern.MinSpread)
         {
-            if (TimeSinceLastShot > DelayBeforDecreaseSpread)
+            if (TimeSinceLastShot > _recoilPattern.DelayBeforDecreaseSpread)
             {
                 _recoilPattern.ResetRecoil();
                 float reductionAmount = _recoilPattern.SpreadEasing * Time.deltaTime;
@@ -151,9 +154,18 @@ public abstract class Weapon : MonoBehaviour
             }
         }
     }
-    public void CreateBulletHole(Vector3 position)
+    public void CreateBulletHole(RaycastHit hit)
     {
+        if (hit.collider.GetComponent<ShotHolesSpawner>()!=null)
+        {
 
-        GameObject bulletHole = Instantiate(HolePrefab, position, Quaternion.identity);
+         hit.collider.GetComponent<ShotHolesSpawner>().TakeShot(hit.point);
+        }
+        else
+        {
+           // GameObject bulletHole = Instantiate(HolePrefab, hit.point, Quaternion.identity);
+
+        }
+      
     }
 }

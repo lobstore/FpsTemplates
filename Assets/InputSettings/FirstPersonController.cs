@@ -62,7 +62,6 @@ public class FirstPersonController : MonoBehaviour
 #endif
     private CharacterController _controller;
     private InputHandler _input;
-    private GameObject _playerCamera;
 
     private const float _threshold = 0.01f;
 
@@ -83,10 +82,6 @@ public class FirstPersonController : MonoBehaviour
         SprintCostStamina = _playerConfig.SprintCost;
         JumpCostStamina = _playerConfig.JumpCost;
         // get a reference to our main camera
-        if (_playerCamera == null)
-        {
-            _playerCamera = GameObject.FindGameObjectWithTag("MainCamera");
-        }
         _controller = GetComponent<CharacterController>();
         _input = GetComponent<InputHandler>();
         _playerInput = GetComponent<PlayerInput>();

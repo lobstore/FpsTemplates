@@ -16,10 +16,12 @@ MonoBehaviour:
     type: 3}
   <WeaponName>k__BackingField: DesertEagle
   <ShotDelay>k__BackingField: 0.5
+  <DelayBeforDecreaseSpread>k__BackingField: 0.9
   <ReloadTime>k__BackingField: 0
   <MaxRange>k__BackingField: 1000
-  <MinSpread>k__BackingField: 0.1
+  <MinSpread>k__BackingField: 0.04
   <MaxSpread>k__BackingField: 0.5
+  <RecoilForce>k__BackingField: 0.06
   <MaxAmmoInMagazine>k__BackingField: 7
   <AmmoAmount>k__BackingField: 21
   <Damage>k__BackingField: 60

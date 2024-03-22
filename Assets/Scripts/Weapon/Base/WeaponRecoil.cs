@@ -1,7 +1,12 @@
 ﻿using UnityEngine;
 
-public class RecoilPattern
+public class WeaponRecoil
 {
+
+
+
+    public float RecoilForce { get; private set; }
+    public float DelayBeforDecreaseSpread { get; private set; }
     public float SpreadEasing { get; protected set; } = 1f;
     public float MinSpread { get; private set; }
     public float MaxSpread { get; private set; }
@@ -50,13 +55,14 @@ public class RecoilPattern
     private float verticalRecoil;
     private float horizontalRecoil;
     Vector3 nextShotPosition = Vector3.zero;
-    public RecoilPattern(WeaponConfig config)
+    public WeaponRecoil(WeaponConfig config)
     {
+        RecoilForce = config.RecoilForce;
         recoilTrace = config.RecoilTrace;
         MinSpread = config.MinSpread;
         MaxSpread = config.MaxSpread;
         CurrentSpread = MinSpread;
-
+        DelayBeforDecreaseSpread = config.DelayBeforDecreaseSpread;
     }
     public void ResetSpread() {
         CurrentSpread = MinSpread;
