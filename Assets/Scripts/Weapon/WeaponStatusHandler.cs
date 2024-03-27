@@ -6,7 +6,7 @@ using UnityEngine;
 public class WeaponStatusHandler : MonoBehaviour
 {
     Weapon prevWeapon;
-    WeaponController _weaponController;
+    WController _weaponController;
     [SerializeField] TextMeshProUGUI currentAmmoText;
     [SerializeField] TextMeshProUGUI amountAmmoText;
     // Start is called before the first frame update
@@ -20,11 +20,11 @@ public class WeaponStatusHandler : MonoBehaviour
     }
     private void Initialize()
     {
-        _weaponController = GetComponent<WeaponController>();
+        _weaponController = GetComponent<WController>();
         if (_weaponController != null)
         {
             _weaponController.OnWeaponSwitched.AddListener(ApplyChangeWeapon);
-            prevWeapon = _weaponController.ActiveWeapon;
+            prevWeapon = _weaponController.ActiveWeaponSlot.Weapon;
             prevWeapon?.OnCurrentAmmoChanged.AddListener(DrawCurrentAmmo);
             prevWeapon?.OnAmountAmmoChanged.AddListener(DrawAmountAmmo);
             currentAmmoText.text = prevWeapon?.CurrentAmmo.ToString();

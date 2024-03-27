@@ -17,8 +17,6 @@ public struct CrosshairData
 }
 public class WeaponController : MonoBehaviour
 {
-    
-    public Transform _camera;
     [SerializeField] private List<Weapon> _weaponsOnStart = new List<Weapon>();
     Weapon[] m_WeaponSlots = new Weapon[9];
     private int activeWeaponIndex = 0;
@@ -58,6 +56,7 @@ public class WeaponController : MonoBehaviour
             foreach (var weapon in _weaponsOnStart)
             {
                 weapon.Owner = Owner;
+
                 AddWeapon(weapon);
             }
             ActiveWeapon = m_WeaponSlots[activeWeaponIndex];
@@ -94,12 +93,12 @@ public class WeaponController : MonoBehaviour
             if (direction > 0)
             {
                 ++ActiveWeaponIndex;
-                while (m_WeaponSlots[ActiveWeaponIndex] == null) { ++ActiveWeaponIndex; }
+                while (m_WeaponSlots[ActiveWeaponIndex] == null || !m_WeaponSlots[ActiveWeaponIndex].IsAvailable) { ++ActiveWeaponIndex; }
             }
             else if (direction < 0)
             {
                 --ActiveWeaponIndex;
-                while (m_WeaponSlots[ActiveWeaponIndex] == null) { --ActiveWeaponIndex; }
+                while (m_WeaponSlots[ActiveWeaponIndex] == null || !m_WeaponSlots[ActiveWeaponIndex].IsAvailable) { --ActiveWeaponIndex; }
             }
 
             SwitchWeapon(m_WeaponSlots[ActiveWeaponIndex]);
@@ -111,9 +110,9 @@ public class WeaponController : MonoBehaviour
     }
     public void SwitchWeapon(Weapon nextWeapon)
     {
-        ActiveWeapon.WeaponRoot.SetActive(false);
+        ActiveWeapon.gameObject.SetActive(false);
         GettingUpWeapon();
-        nextWeapon.WeaponRoot.SetActive(true);
+        nextWeapon.gameObject.SetActive(true);
         ActiveWeapon = nextWeapon;
         OnWeaponSwitched.Invoke(ActiveWeapon);
     }
@@ -136,9 +135,8 @@ public class WeaponController : MonoBehaviour
                 weaponInstance.transform.localPosition = Vector3.zero;
                 weaponInstance.transform.localRotation = Quaternion.identity;
 
-                weaponInstance.WeaponRoot.SetActive(false);
-
-
+                weaponInstance.gameObject.SetActive(false);
+                weaponInstance.OnWeaponNotAvailable.AddListener(() => ScrollWeapon(-1));
                 m_WeaponSlots[i] = weaponInstance;
 
                 return true;

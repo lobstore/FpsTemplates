@@ -11,6 +11,7 @@ public class InputHandler : MonoBehaviour, IMoveInput, IWeaponInput
     public UnityEvent<bool> IsShooting { get; } = new ();
     public UnityEvent<float> OnWeaponSwitch { get; } = new ();
     public UnityEvent OnWeaponDrop { get; } = new ();
+    public UnityEvent OnWeaponPickUp { get; } = new ();
     public UnityEvent<bool> IsCrouching { get; } = new();
     public UnityEvent OnAmmoReload { get; }=new();
 
@@ -62,6 +63,14 @@ public class InputHandler : MonoBehaviour, IMoveInput, IWeaponInput
         if (value.isPressed)
         {
             OnWeaponDrop.Invoke();
+        }
+    }
+
+    public void OnInteract(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            OnWeaponPickUp.Invoke();
         }
     }
     public void OnCrouch(InputValue value)

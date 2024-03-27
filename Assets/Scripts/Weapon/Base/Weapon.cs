@@ -2,10 +2,17 @@ using Cinemachine;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+
+[RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(AudioSource))]
 [RequireComponent(typeof(Animator))]
-public abstract class Weapon : MonoBehaviour
+[RequireComponent(typeof(Rigidbody))]
+
+public abstract class Weapon : MonoBehaviour, IInteractable
 {
+
+    //public bool IsDropped = false;
+    public WeaponType WeaponType;
     protected WeaponRecoil _recoilPattern;
     protected WeaponMagazine _magazine;
     protected Animator _animator;
@@ -19,12 +26,10 @@ public abstract class Weapon : MonoBehaviour
     public UnityEvent<int> OnAmountAmmoChanged { get; } = new();
     public string WeaponName { get; protected set; }
     [field: SerializeField]
-    protected Transform FpsCamera { get; set; }
 
-    [field: SerializeField]
-    public GameObject WeaponRoot { get; protected set; }
     public UnityEvent<Transform> OnShot { get; } = new();
     public UnityEvent OnAmmoExpired { get; } = new();
+    public UnityEvent OnWeaponNotAvailable { get; } = new();
 
     public float ShotDelay { get; protected set; }
     public float ReloadTime { get; protected set; }
@@ -37,11 +42,13 @@ public abstract class Weapon : MonoBehaviour
     }
 
     protected int Damage { get; set; }
-    public bool IsShooting { get; set; } = false;
-    public bool IsOnCooldown { get; set; } = true;
-    protected bool IsReloading { get; set; } = false;
+    public bool IsShooting = false;
+    public bool IsOnCooldown = false;
+    [SerializeField] protected bool IsReloading = false;
 
-
+    public bool IsAvailable = true;
+    private Rigidbody _weaponRigidbody;
+    private Collider _weaponColider;
 
     [SerializeField]
     WeaponConfig config;
@@ -52,6 +59,9 @@ public abstract class Weapon : MonoBehaviour
 
         if (config != null)
         {
+            enabled = false;
+            _weaponRigidbody = GetComponent<Rigidbody>();
+            _weaponColider = GetComponent<Collider>();
             _animator = GetComponent<Animator>();
             _audioSource = GetComponent<AudioSource>();
             _magazine = new WeaponMagazine(config);
@@ -65,14 +75,15 @@ public abstract class Weapon : MonoBehaviour
             shot_Clip = config.ShotClip;
             reload_Clip = config.ReloadClip;
             ReloadTime = config.ReloadTime;
-            FpsCamera = Camera.main.transform;
             _recoilPattern = new WeaponRecoil(config);
             _cameraShake = GetComponent<CinemachineImpulseSource>();
+            IsAvailable = true;
         }
 
     }
     private void OnEnable()
     {
+        IsReloading = false;
         _animator.SetBool("Reloading", false);
     }
     private void OnDisable()
@@ -111,10 +122,10 @@ public abstract class Weapon : MonoBehaviour
         {
             RaycastHit hit;
             Vector3 nextPosition = _recoilPattern.NextPosition();
-            Vector3 horizontalDir = nextPosition.x * FpsCamera.transform.right;
-            Vector3 verticalDir = nextPosition.y * FpsCamera.transform.up;
+            Vector3 horizontalDir = nextPosition.x * Owner.cam.transform.right;
+            Vector3 verticalDir = nextPosition.y * Owner.cam.transform.up;
             Vector3 shootDir = horizontalDir + verticalDir;
-            Physics.Raycast(FpsCamera.position, FpsCamera.forward + shootDir, out hit, MaxRange);
+            Physics.Raycast(Owner.cam.transform.position, Owner.cam.transform.forward + shootDir, out hit, MaxRange);
             if (hit.collider != null && hit.collider.GetComponent<Character>() != Owner)
             {
                 CreateBulletHole(hit);
@@ -128,7 +139,15 @@ public abstract class Weapon : MonoBehaviour
             TimeSinceLastShot = 0;
             _audioSource.PlayOneShot(shot_Clip);
             _recoilPattern.CurrentSpread += _recoilPattern.RecoilForce;
-            _cameraShake.GenerateImpulse(FpsCamera.up);
+            if (_cameraShake != null)
+            {
+                _cameraShake.GenerateImpulse(Owner.cam.transform.up);
+            }
+            else
+            {
+                Debug.LogWarning("There is no CinemachineImpulseSource on this Weapon");
+            }
+
         }
         else if (_magazine.CurrentAmmo <= 0 && !IsReloading)
         {
@@ -138,12 +157,13 @@ public abstract class Weapon : MonoBehaviour
     }
     virtual protected void Update()
     {
-        Debug.Log(_recoilPattern.CurrentSpread);
         TimeSinceLastShot += Time.deltaTime;
+
         if (Owner.Velocity.magnitude > 0)
         {
             _recoilPattern.CurrentSpread += (_recoilPattern.SpreadEasing + Owner.Velocity.magnitude) * Time.deltaTime;
-        }else if (_recoilPattern.CurrentSpread > _recoilPattern.MinSpread)
+        }
+        else if (_recoilPattern.CurrentSpread > _recoilPattern.MinSpread)
         {
             if (TimeSinceLastShot > _recoilPattern.DelayBeforDecreaseSpread)
             {
@@ -156,16 +176,16 @@ public abstract class Weapon : MonoBehaviour
     }
     public void CreateBulletHole(RaycastHit hit)
     {
-        if (hit.collider.GetComponent<ShotHolesSpawner>()!=null)
+        if (hit.collider.GetComponent<ShotHolesSpawner>() != null)
         {
 
-         hit.collider.GetComponent<ShotHolesSpawner>().TakeShot(hit.point);
+            hit.collider.GetComponent<ShotHolesSpawner>().TakeShot(hit);
         }
         else
         {
-           // GameObject bulletHole = Instantiate(HolePrefab, hit.point, Quaternion.identity);
+            // GameObject bulletHole = Instantiate(HolePrefab, hit.point, Quaternion.identity);
 
         }
-      
+
     }
 }

@@ -6,6 +6,7 @@ public class ShotHolesSpawner : MonoBehaviour
 {
     private ObjectPool<GameObject> _pool;
     private Vector3 _shotDestination;
+    private Vector3 _shotNormal;
     public GameObject prefab;
     [SerializeField] float destroyTime;
     // Start is called before the first frame update
@@ -20,15 +21,18 @@ public class ShotHolesSpawner : MonoBehaviour
         return temp;
     }
 
-    public void TakeShot(Vector3 shotPosition)
+    public void TakeShot(RaycastHit shotHit)
     {
-        _shotDestination = shotPosition;
+        _shotDestination = shotHit.point;
+        _shotNormal = shotHit.normal;
         _pool.Get();
     }
 
     private void OnGet(GameObject go)
     {
-        go.transform.position = _shotDestination;
+        go.transform.position = _shotDestination + _shotNormal*0.01f;
+        go.transform.rotation = Quaternion.LookRotation(_shotNormal);
+        
         go.SetActive(true);
         StartCoroutine(SetLifetime(go));
     }

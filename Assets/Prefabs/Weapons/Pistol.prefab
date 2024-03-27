@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 7006415222424394625}
   - component: {fileID: 5178681633714217230}
   - component: {fileID: 1081904233883278328}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Pistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -105,7 +105,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -131,7 +131,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -148,8 +148,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 716a2cbc7b8fb8a4aa4a7706ede3a198, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WeaponType: 5
   Owner: {fileID: 0}
-  <WeaponRoot>k__BackingField: {fileID: 1942510410703549421}
+  IsShooting: 0
+  IsOnCooldown: 0
+  IsReloading: 0
+  IsAvailable: 1
   config: {fileID: 11400000, guid: de25a6b1879264f4f93ad36b539bc5d9, type: 2}
 --- !u!82 &5178681633714217230
 AudioSource:
@@ -207,7 +211,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
