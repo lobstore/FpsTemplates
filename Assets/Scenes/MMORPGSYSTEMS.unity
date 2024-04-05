@@ -1011,6 +1011,11 @@ PrefabInstance:
       propertyPath: cam
       value: 
       objectReference: {fileID: 1641989019}
+    - target: {fileID: 3228290134482342153, guid: f08468ad83d065143826f79d54ce8951,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3508424727064370851, guid: f08468ad83d065143826f79d54ce8951,
         type: 3}
       propertyPath: healthSlider
@@ -1085,6 +1090,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7014732175015387433, guid: f08468ad83d065143826f79d54ce8951,
+        type: 3}
+      propertyPath: m_Name
+      value: Player Virtual Camera
       objectReference: {fileID: 0}
     - target: {fileID: 7390667702105852712, guid: f08468ad83d065143826f79d54ce8951,
         type: 3}

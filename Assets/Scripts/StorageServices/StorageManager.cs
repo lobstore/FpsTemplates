@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using Zenject;
 public class StorageManager
 {
     #region Events
@@ -28,7 +27,6 @@ public class StorageManager
         }
     }
 
-    [Inject]
     public StorageManager(StorageService storageService, List<IDataPersistance> dataPersistances)
     {
         StorageService = storageService;
